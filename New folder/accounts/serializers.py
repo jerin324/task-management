@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate
 
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .models import User
+from .models import User, Profile
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -58,3 +58,23 @@ class LoginSerializer(serializers.Serializer):
     'refresh': str(refresh),
     'access': str(refresh.access_token),
 }
+        
+        
+class ProfileSerializer(serializers.ModelSerializer):
+
+    class Meta:
+
+        model = Profile
+
+        fields = [
+            'id',
+            'bio',
+            'profile_picture',
+            'phone',
+            'github_link',
+            'created_at'
+        ]
+
+        read_only_fields = [
+            'created_at'
+        ]

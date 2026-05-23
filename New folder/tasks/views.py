@@ -61,6 +61,12 @@ class TaskListCreateView(APIView):
                 status=status.HTTP_403_FORBIDDEN
             )
 
+        if board.owner != request.user:
+            return Response(
+                {"error": "Only board owner can create tasks"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
         serializer = TaskSerializer(
             data=request.data
         )
@@ -174,6 +180,31 @@ class TaskDetailView(APIView):
 class CommentCreateView(APIView):
 
     permission_classes = [IsAuthenticated]
+
+    def get(self, request, task_id):
+
+        try:
+            task = Task.objects.get(id=task_id)
+
+        except Task.DoesNotExist:
+            return Response(
+                {"error": "Task not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        if not is_board_member(task.board, request.user):
+
+            return Response(
+                {"error": "Permission denied"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        comments = task.comments.all()
+        serializer = CommentSerializer(
+            comments,
+            many=True
+        )
+        return Response(serializer.data)
 
     def post(self, request, task_id):
 
