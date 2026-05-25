@@ -4,40 +4,33 @@ from .models import Task, Comment
 
 
 class CommentSerializer(serializers.ModelSerializer):
-
-    user_email = serializers.EmailField(
-        source='user.email',
-        read_only=True
-    )
+    author = serializers.CharField(source='user.email', read_only=True)
+    created_by = serializers.CharField(source='user.email', read_only=True)
 
     class Meta:
-
         model = Comment
-
-        fields = '__all__'
+        fields = ['id', 'text', 'author', 'created_by', 'created_at']
 
         read_only_fields = [
             'user',
             'task',
-            'user_email'
+            'author',
+            'created_by',
+            'created_at'
         ]
 
 
 class TaskSerializer(serializers.ModelSerializer):
-
-    comments = CommentSerializer(
-        many=True,
-        read_only=True
-    )
+    created_by = serializers.CharField(source='created_by.email', read_only=True)
+    comments = CommentSerializer(many=True, read_only=True)
 
     class Meta:
-
         model = Task
-
-        fields = '__all__'
+        fields = ['id', 'board', 'title', 'description', 'status', 'created_by', 'created_at', 'comments']
 
         read_only_fields = [
             'created_by',
             'board',
-            'comments'
+            'comments',
+            'created_at'
         ]
